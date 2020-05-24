@@ -54,13 +54,6 @@ public class NumericalBow extends JPanel {
         //Layout
         setBackground(new Color(0xFFEBCD));
 
-//        addMouseMotionListener(new MouseMotionAdapter() {
-//            public void mouseDragged(MouseEvent e) {
-//                Graphics g = getGraphics();
-//                g.drawLine(lastPoint.x, lastPoint.y, e.getX(), e.getY());
-//                g.dispose();
-//            }
-//        });
         this.p1 = new Point(100, 100);
         this.p2 = new Point(700, 100);
 
@@ -84,6 +77,14 @@ public class NumericalBow extends JPanel {
             }
         });
 
+//        addMouseMotionListener(new MouseMotionAdapter() {
+//            public void mouseDragged(MouseEvent e) {
+//                Graphics g = getGraphics();
+//                g.drawLine(lastPoint.x, lastPoint.y, e.getX(), e.getY());
+//                g.dispose();
+//            }
+//        });
+//
 //        addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed(KeyEvent e) {
@@ -146,36 +147,41 @@ public class NumericalBow extends JPanel {
         g.fillOval(p.x - width - 10, p.y + width, height / 2 - width, height / width + 2);
         g.fillOval(p.x + width, p.y + width, height / 2 - width, height / width + 2);
 
-        //TODO: Movable hand & bow, link with arrow
-        //TODO: Arrow dragging (control both power & angle)
         //bow
+        //TODO: Movable hand & bow, link with arrow
+        
+        //TODO: Arrow dragging (control both power & angle)
+        
+        
         //arrow
         if (init[0] & !isReleased[0] & isFaceRight) {
-            arrowLoc[0] = new Point(p.x + 20, p.y);
-            arrow[0] = new Arrow(g, arrowLoc[0], isFaceRight);
+            arrow[0] = new Arrow(g, new Point(p.x + 20, p.y), isFaceRight);
 
             System.out.println("Arrow 0 created");
+//            System.out.println("Arrow 0 initial : " + Arrays.toString(arrow[0].xPoints));
+
         } else if (init[1] & !isReleased[1] & !isFaceRight) {
-            arrowLoc[1] = new Point(p.x - 50, p.y);
-            arrow[1] = new Arrow(g, arrowLoc[1], isFaceRight);
+            arrow[1] = new Arrow(g, new Point(p.x - 50, p.y), isFaceRight);
 
             System.out.println("Arrow 1 created");
+//            System.out.println("Arrow 1 initial : " + Arrays.toString(arrow[1].xPoints));
+
         }
 
         if (isReleased[0] & isFaceRight) {
             if (toMove[0]) {
-                arrow[0] = move(g, arrowLoc[0], 20, isFaceRight);
+                arrow[0].move(g, 10);
                 System.out.println("Arrow 0 : " + Arrays.toString(arrow[0].xPoints));
             } else {
-                arrow[0] = move(g, arrowLoc[0], 0, isFaceRight);
+                arrow[0].move(g, 0);
             }
         } else if (isReleased[1] & !isFaceRight) {
             if (toMove[1]) {
-                arrow[1] = move(g, arrowLoc[1], 20, isFaceRight);
+                arrow[1].move(g, 10);
                 System.out.println("Arrow 1 : " + Arrays.toString(arrow[1].xPoints));
 
             } else {
-                arrow[1] = move(g, arrowLoc[1], 0, isFaceRight);
+                arrow[1].move(g, 0);
             }
 
         }
@@ -204,20 +210,7 @@ public class NumericalBow extends JPanel {
         g.drawString("Angle : 0", 700, 60);
     }
 
-    //TODO: arrow movement (acceleration, decceleration), rotation
     //TODO: scene follow arrow position
-    public Arrow move(Graphics g, Point arrowPoint, int velocity, boolean isFaceRight) {
-
-        if (isFaceRight) {
-            arrowPoint.x += velocity;
-        } else {
-            arrowPoint.x -= velocity;
-        }
-        
-        //TODO: update arrow position in Arrow class instead of create a new Arrow instance
-        return new Arrow(g, arrowPoint, isFaceRight);
-    }
-
     //TODO: scene scrolling (keyboard)
     public void sceneScroll() {
 

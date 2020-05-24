@@ -7,7 +7,6 @@ public class Arrow {
     private Point arrowLoc;
     private int arrowL = 35;
     private int arrowW = 2;
-    private Graphics g;
     private boolean isToRight;
 
     private double angle;
@@ -18,8 +17,7 @@ public class Arrow {
     int[] xPoints;
     int[] yPoints;
 
-    public Arrow(Graphics g, Point loc, boolean isToRight) {
-        this.g = g;
+    public Arrow(Graphics g,Point loc, boolean isToRight) {
         this.isToRight = isToRight;
         this.arrowLoc = loc;
 
@@ -56,16 +54,30 @@ public class Arrow {
 
         this.arrowLoc = loc;
 
-        drawArrow();
+        drawArrow(g);
     }
 
     public Point getArrowLoc() {
         return arrowLoc;
     }
 
-
-    public void drawArrow() {
+    public void drawArrow(Graphics g) {
         g.drawPolygon(xPoints, yPoints, xPoints.length);
+    }
+
+    //TODO: arrow movement (acceleration, decceleration), rotation
+    public void move(Graphics g, int velocity) {
+        if (isToRight) {
+            for (int i = 0; i < xPoints.length; i++) {
+                xPoints[i] += velocity;
+            }
+        } else {
+            for (int i = 0; i < xPoints.length; i++) {
+                xPoints[i] -= velocity;
+            }
+        }
+        drawArrow(g);
+
     }
 
 }

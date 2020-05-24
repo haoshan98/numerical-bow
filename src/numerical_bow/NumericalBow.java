@@ -213,6 +213,8 @@ public class NumericalBow extends JPanel {
         } else {
             arrowPoint.x -= velocity;
         }
+        
+        //TODO: update arrow position in Arrow class instead of create a new Arrow instance
         return new Arrow(g, arrowPoint, isFaceRight);
     }
 

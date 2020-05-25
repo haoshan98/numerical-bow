@@ -1,6 +1,7 @@
 package numerical_bow;
 
 import java.awt.*;
+import java.awt.geom.*;
 
 public class Arrow {
 
@@ -13,14 +14,14 @@ public class Arrow {
     private double power;
     private double accelaration;
     private double gravity = 9.81;
+    private Polygon polygon;
 
-    int[] xPoints;
-    int[] yPoints;
-
-    public Arrow(Graphics g,Point loc, boolean isToRight) {
+    public Arrow(Graphics g, Point loc, boolean isToRight) {
         this.isToRight = isToRight;
         this.arrowLoc = loc;
 
+        int[] xPoints;
+        int[] yPoints;
         //set arrow facing side
         if (isToRight) {
             xPoints = new int[]{2, 0, 1, 3, 8, 8, 10, 8, 8, 3, 1, 0};
@@ -52,9 +53,19 @@ public class Arrow {
             yPoints[i] += loc.y;
         }
 
+        this.polygon = new Polygon(xPoints, yPoints, xPoints.length);
+
         this.arrowLoc = loc;
 
         drawArrow(g);
+    }
+
+    public void setPolygon(Polygon polygon) {
+        this.polygon = polygon;
+    }
+
+    public Polygon getPolygon() {
+        return polygon;
     }
 
     public Point getArrowLoc() {
@@ -62,20 +73,37 @@ public class Arrow {
     }
 
     public void drawArrow(Graphics g) {
-        g.drawPolygon(xPoints, yPoints, xPoints.length);
+        g.drawPolygon(polygon);
     }
 
     //TODO: arrow movement (acceleration, decceleration), rotation
     public void move(Graphics g, int velocity) {
         if (isToRight) {
-            for (int i = 0; i < xPoints.length; i++) {
-                xPoints[i] += velocity;
+            for (int i = 0; i < polygon.npoints; i++) {
+                polygon.xpoints[i] += velocity;
             }
         } else {
-            for (int i = 0; i < xPoints.length; i++) {
-                xPoints[i] -= velocity;
+            for (int i = 0; i < polygon.npoints; i++) {
+                polygon.xpoints[i] -= velocity;
             }
         }
+        drawArrow(g);
+
+    }
+
+    public void rotate(Graphics g, int angle) {
+
+        AffineTransform rotate = AffineTransform.getRotateInstance(
+                Math.toRadians(angle), 100, 100);
+        
+        Polygon translatedPolygon = new Polygon();
+
+        for (int i = 0; i < polygon.npoints; i++) {
+            Point p = new Point(polygon.xpoints[i], polygon.ypoints[i]);
+            rotate.transform(p, p);
+            translatedPolygon.addPoint(p.x, p.y);
+        }
+        setPolygon(translatedPolygon);
         drawArrow(g);
 
     }

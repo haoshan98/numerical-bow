@@ -10,7 +10,7 @@ public class SplashScreen extends JWindow {
     ImageIcon imageIcon;
 
     public SplashScreen() {
-        splashScreen = Toolkit.getDefaultToolkit().getImage("C:\\Users\\ASUS\\Documents\\NetBeansProjects\\Numerical-Bow\\src\\numerical_bow\\shoot.jpg");
+        splashScreen = Toolkit.getDefaultToolkit().getImage("src\\numerical_bow\\shoot.jpg");
         // Create ImageIcon from Image
         imageIcon = new ImageIcon(splashScreen);
         // Set JWindow size from image size

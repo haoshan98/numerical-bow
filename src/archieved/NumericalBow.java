@@ -194,7 +194,7 @@ public class NumericalBow extends JPanel {
         g.drawLine(0, 300, 900, 300);
     }
 
-    //TODO: lifeBar update
+    //TODo: lifeBar update
     public void lifeBar(Graphics g) {
         //lifebar
 

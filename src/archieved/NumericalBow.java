@@ -1,14 +1,13 @@
-package numerical_bow;
+package archieved;
 
+import numerical_bow.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.JWindow;
 
 // http://greenteapress.com/thinkjava6/html/thinkjava6017.html
 // https://www.youtube.com/watch?v=pDafZdIIeNE
-// https://gamedev.stackexchange.com/questions/44256/how-to-add-a-scrolling-camera-to-a-2d-java-game
 /**
  * 1) Once the game is start, both player stand at their position, with bow and
  * arrow
@@ -43,14 +42,6 @@ public class NumericalBow extends JPanel {
 
     private Image img;
     private Point lastPoint;
-    private Dimension world_size;
-    private Dimension viewport_size;
-    private int offsetMaxX;
-    private int offsetMaxY;
-    private int offsetMinX;
-    private int offsetMinY;
-    private int camX = 0;
-    private int camY = 0;
     private final Point p1;  //player 1
     private final Point p2;  //player 2
     private Arrow[] arrow = new Arrow[2];
@@ -61,41 +52,9 @@ public class NumericalBow extends JPanel {
 
     public NumericalBow() {
 
-//        SplashScreen splash = new SplashScreen();
-//        try {
-//            // Make JWindow appear for 1.5 seconds before disappear
-//            Thread.sleep(1500);
-//            splash.dispose();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
         //Layout
         setBackground(new Color(0xFFEBCD));
-        this.viewport_size = Toolkit.getDefaultToolkit().getScreenSize();
-        setPreferredSize(new Dimension(10000, viewport_size.height));
-        this.world_size = getPreferredSize();
 
-        //camera view
-        this.offsetMaxX = world_size.width - viewport_size.width;
-        this.offsetMaxY = world_size.height - viewport_size.height;
-        this.offsetMinX = 0;
-        this.offsetMinY = 0;
-
-//        camX = playerX - VIEWPORT_SIZE_X / 2
-//        camY = playerY - VIEWPORT_SIZE_Y / 2
-//                
-//        if (camX > offsetMaxX) {
-//            camX = offsetMaxX;
-//        } else if (camX < offsetMinX) {
-//            camX = offsetMinX;
-//        }
-//        if (camY > offsetMaxY) {
-//            camY = offsetMaxY;
-//        } else if (camY < offsetMinY) {
-//            camY = offsetMinY;
-//        }
-        //Players init
         this.p1 = new Point(100, 100);
         this.p2 = new Point(700, 100);
 
@@ -115,7 +74,6 @@ public class NumericalBow extends JPanel {
                     toMove[1] = true;
                     toMove[0] = false;
                 }
-                updateCamera();
                 repaint();
             }
         });
@@ -152,27 +110,6 @@ public class NumericalBow extends JPanel {
 //            }
 //        });
     }
-    
-
-    private void updateCamera() {
-
-//        camX = playerX - VIEWPORT_SIZE_X / 2
-//        camY = playerY - VIEWPORT_SIZE_Y / 2
-        this.camX = arrow[0].xPoints[6] - this.viewport_size.width / 2;
-        this.camY = arrow[0].yPoints[6] - this.viewport_size.height / 2;
-        System.out.println(camX);
-
-        if (camX > offsetMaxX) {
-            camX = offsetMaxX;
-        } else if (camX < offsetMinX) {
-            camX = offsetMinX;
-        }
-        if (camY > offsetMaxY) {
-            camY = offsetMaxY;
-        } else if (camY < offsetMinY) {
-            camY = offsetMinY;
-        }
-    }
 
     @Override
     public void paintComponent(Graphics gg) {
@@ -180,8 +117,6 @@ public class NumericalBow extends JPanel {
         Graphics2D g = (Graphics2D) gg;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g.translate(-camX, -camY);
 
         draw(g);
     }
@@ -215,7 +150,10 @@ public class NumericalBow extends JPanel {
 
         //bow
         //TODO: Movable hand & bow, link with arrow
+        
         //TODO: Arrow dragging (control both power & angle)
+        
+        
         //arrow
         if (init[0] & !isReleased[0] & isFaceRight) {
             arrow[0] = new Arrow(g, new Point(p.x + 20, p.y), isFaceRight);
@@ -233,14 +171,14 @@ public class NumericalBow extends JPanel {
 
         if (isReleased[0] & isFaceRight) {
             if (toMove[0]) {
-                arrow[0].move(g, 50);
+                arrow[0].move(g, 10);
                 System.out.println("Arrow 0 : " + Arrays.toString(arrow[0].xPoints));
             } else {
                 arrow[0].move(g, 0);
             }
         } else if (isReleased[1] & !isFaceRight) {
             if (toMove[1]) {
-                arrow[1].move(g, 50);
+                arrow[1].move(g, 10);
                 System.out.println("Arrow 1 : " + Arrays.toString(arrow[1].xPoints));
 
             } else {

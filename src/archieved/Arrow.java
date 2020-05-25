@@ -66,7 +66,7 @@ public class Arrow {
         g.drawPolygon(xPoints, yPoints, xPoints.length);
     }
 
-    //TODo: arrow movement (acceleration, decceleration), rotation
+    //TO: arrow movement (acceleration, decceleration), rotation
     public void move(Graphics g, int velocity) {
         if (isToRight) {
             for (int i = 0; i < xPoints.length; i++) {

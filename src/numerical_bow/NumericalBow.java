@@ -58,6 +58,8 @@ public class NumericalBow extends JPanel {
     private boolean[] isReleased = {false, false};
     private boolean[] init = {true, true};
     private boolean[] toMove = {false, false};
+    private boolean isDrag = false;
+    private boolean once = true;
 
     public NumericalBow() {
 
@@ -118,15 +120,21 @@ public class NumericalBow extends JPanel {
                 updateCamera();
                 repaint();
             }
+            
         });
 
-//        addMouseMotionListener(new MouseMotionAdapter() {
-//            public void mouseDragged(MouseEvent e) {
-//                Graphics g = getGraphics();
-//                g.drawLine(lastPoint.x, lastPoint.y, e.getX(), e.getY());
-//                g.dispose();
-//            }
-//        });
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                init[0] = false;
+                init[1] = false;
+                isDrag = true;
+                System.out.println(e.getX() + ", "+ e.getY());
+                
+                updateCamera();
+                repaint();
+            }
+        });
 //
 //        addKeyListener(new KeyAdapter() {
 //            @Override
@@ -158,9 +166,8 @@ public class NumericalBow extends JPanel {
 
 //        camX = playerX - VIEWPORT_SIZE_X / 2
 //        camY = playerY - VIEWPORT_SIZE_Y / 2
-        this.camX = arrow[0].xPoints[6] - this.viewport_size.width / 2;
-        this.camY = arrow[0].yPoints[6] - this.viewport_size.height / 2;
-        System.out.println(camX);
+        this.camX = arrow[0].getPolygon().xpoints[6] - this.viewport_size.width / 2;
+        this.camY = arrow[0].getPolygon().ypoints[6] - this.viewport_size.height / 2;
 
         if (camX > offsetMaxX) {
             camX = offsetMaxX;
@@ -234,20 +241,26 @@ public class NumericalBow extends JPanel {
         if (isReleased[0] & isFaceRight) {
             if (toMove[0]) {
                 arrow[0].move(g, 50);
-                System.out.println("Arrow 0 : " + Arrays.toString(arrow[0].xPoints));
+                System.out.println("Arrow 0 : " + Arrays.toString(arrow[0].getPolygon().xpoints));
             } else {
                 arrow[0].move(g, 0);
             }
         } else if (isReleased[1] & !isFaceRight) {
             if (toMove[1]) {
                 arrow[1].move(g, 50);
-                System.out.println("Arrow 1 : " + Arrays.toString(arrow[1].xPoints));
+                System.out.println("Arrow 1 : " + Arrays.toString(arrow[1].getPolygon().xpoints));
 
             } else {
                 arrow[1].move(g, 0);
             }
 
         }
+        
+//        if (isDrag & once){
+//            once = false;
+//            arrow[0].rotate(g, 100);
+//            System.out.println("=======================");
+//        }
 
     }
 

@@ -149,9 +149,9 @@ public class NumericalBow extends JPanel {
         g.fillOval(p.x + width, p.y + width, height / 2 - width, height / width + 2);
 
         //bow
-        //TODO: Movable hand & bow, link with arrow
+        //TODo: Movable hand & bow, link with arrow
         
-        //TODO: Arrow dragging (control both power & angle)
+        //TODo: Arrow dragging (control both power & angle)
         
         
         //arrow
@@ -194,7 +194,7 @@ public class NumericalBow extends JPanel {
         g.drawLine(0, 300, 900, 300);
     }
 
-    //TODO: lifeBar update
+    //TODo: lifeBar update
     public void lifeBar(Graphics g) {
         //lifebar
 
@@ -211,12 +211,12 @@ public class NumericalBow extends JPanel {
         g.drawString("Angle : 0", 700, 60);
     }
 
-    //TODO: scene follow arrow position
-    //TODO: scene scrolling (keyboard)
+    //TODo: scene follow arrow position
+    //TODo: scene scrolling (keyboard)
     public void sceneScroll() {
 
     }
 
-    //TODO: maintain dropped arrow, change color
+    //TODo: maintain dropped arrow, change color
     //
 }

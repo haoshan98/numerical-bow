@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-// create branch commit jiaqi
 
 public class MainFrame {
 

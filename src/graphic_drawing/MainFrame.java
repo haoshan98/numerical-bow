@@ -10,10 +10,11 @@ public class MainFrame {
         JFrame frame = new JFrame("Graphic Drawing");
         BorderLayout layout = new BorderLayout();
         frame.setLayout(layout);
-
-        frame.getContentPane().add(new graphics(), BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 500);
+        
+        Bow ok = new Bow(new int[]{300,300},1);
+        //frame.getContentPane().add(new Bow(), BorderLayout.CENTER);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }

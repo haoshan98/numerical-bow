@@ -25,7 +25,7 @@ public class playerGraphics extends Component implements MouseListener, MouseMot
 
         Container cPane = jFrame.getContentPane();
 
-        Sketch sk = new Sketch();
+        playerGraphics sk = new playerGraphics();
 
         cPane.setLayout(new BorderLayout());
 

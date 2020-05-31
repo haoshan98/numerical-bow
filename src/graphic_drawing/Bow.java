@@ -30,7 +30,7 @@ public class Bow extends Container implements MouseListener, MouseMotionListener
     private int bow_size;
     private float rotation_angle=0;
     float x_axis_bow_string;
-    private float string_power=0;
+    private double string_power=0;
     private boolean left=true;
     int curX;int curY;
     static Label stat;
@@ -78,20 +78,24 @@ public class Bow extends Container implements MouseListener, MouseMotionListener
         
         
         //for count string power and bow string
+        int max_pull=x_axis-(x_arrow_middle_position_right-x_axis)*2;
         
-        if (curX<x_axis){
+        if (curX>x_axis){
             //this.string_power=curX/((x_arrow_middle_position_right-x_axis)*2);
-            x_axis_bow_string=curX;
-        }else{
+            this.string_power=0;
+        }else if(max_pull<=curX && curX<=x_axis){
+            this.string_power= (double)(x_axis-curX)/(((x_arrow_middle_position_right-x_axis))*2);
+        }
+        else if(curX<=max_pull){
             this.string_power=1;
         }
         System.out.print(this.string_power);
-        //float x_axis_bow_string =x_axis-((x_arrow_middle_position_right-x_axis)*2*this.string_power);
+        double x_axis_bow_string =x_axis-((x_arrow_middle_position_right-x_axis)*2*this.string_power);
         if (this.string_power==0){
             x_axis_bow_string=x_axis;
         }
 
-        int[] x_bow_string={x_arrow_top_down_position,(int)curX,x_arrow_top_down_position};
+        int[] x_bow_string={x_arrow_top_down_position,(int)x_axis_bow_string,x_arrow_top_down_position};
         //int[] y_bow_string={y_top_arrow_position,y_middle_arrow_postion,y_down_arrow_position};
         int[] y_bow_string={y_top_arrow_position,(int)Math.round(curY),y_down_arrow_position};
         
@@ -103,9 +107,9 @@ public class Bow extends Container implements MouseListener, MouseMotionListener
         
         
         this.rotate_bow(getAngle(x_axis, y_axis));
-        g.drawPolyline(x_bow_string, y_bow_string, 3);
-        g2d.rotate(Math.toRadians(-this.rotation_angle),x_axis,y_axis);
         
+        g2d.rotate(Math.toRadians(-this.rotation_angle),x_axis,y_axis);
+        g.drawPolyline(x_bow_string, y_bow_string, 3);
         //draw shape/image (will be rotated)      
         g.drawPolygon( x_top_tri, y_top_tri, 3);
         g.drawPolygon( x_bottom_tri, y_bottom_tri, 3);

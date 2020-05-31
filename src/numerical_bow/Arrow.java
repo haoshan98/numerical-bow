@@ -2,13 +2,14 @@ package numerical_bow;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.util.Arrays;
 
-public class Arrow {
+public class Arrow{
 
-    private Point arrowLoc;
+    private Point arrowInitLoc;
     private int arrowL = 35;
     private int arrowW = 2;
-    private boolean isToRight;
+    private boolean isLeft;
 
     private double angle;
     private double power;
@@ -16,14 +17,16 @@ public class Arrow {
     private double gravity = 9.81;
     private Polygon polygon;
 
-    public Arrow(Graphics g, Point loc, boolean isToRight) {
-        this.isToRight = isToRight;
-        this.arrowLoc = loc;
+    private boolean isStop = false;
+
+    public Arrow(Graphics g, Point loc, boolean isLeft) {
+        this.isLeft = isLeft;
+        this.arrowInitLoc = loc;
 
         int[] xPoints;
         int[] yPoints;
         //set arrow facing side
-        if (isToRight) {
+        if (isLeft) {
             xPoints = new int[]{2, 0, 1, 3, 8, 8, 10, 8, 8, 3, 1, 0};
             yPoints = new int[]{6, 8, 9, 7, 7, 8, 6, 4, 5, 5, 3, 4};
 
@@ -55,7 +58,7 @@ public class Arrow {
 
         this.polygon = new Polygon(xPoints, yPoints, xPoints.length);
 
-        this.arrowLoc = loc;
+        this.arrowInitLoc = loc;
 
         drawArrow(g);
     }
@@ -68,17 +71,39 @@ public class Arrow {
         return polygon;
     }
 
-    public Point getArrowLoc() {
-        return arrowLoc;
+    public Point getArrowInitLoc() {
+        return arrowInitLoc;
+    }
+
+    public Point getArrowCurrentLoc() {
+        return new Point(getPolygon().xpoints[6], getPolygon().ypoints[6]);
     }
 
     public void drawArrow(Graphics g) {
-        g.drawPolygon(polygon);
+        
+        g.fillPolygon(polygon);
+        System.out.println(polygon.xpoints[6]);
+//        g.drawOval(polygon.xpoints[0], polygon.ypoints[0], 5, 5);
+    }
+    
+    public void pull(Graphics g, int x, int y){
+        if (isLeft) {
+            for (int i = 0; i < polygon.npoints; i++) {
+                polygon.xpoints[i] += x/100;
+//                polygon.ypoints[i] -= y/100;
+            }
+        } else {
+            for (int i = 0; i < polygon.npoints; i++) {
+                polygon.xpoints[i] -= x/100;
+//                polygon.ypoints[i] -= y/100;
+            }
+        }
+        drawArrow(g);
     }
 
     //TODO: arrow movement (acceleration, decceleration), rotation
     public void move(Graphics g, int velocity) {
-        if (isToRight) {
+        if (isLeft) {
             for (int i = 0; i < polygon.npoints; i++) {
                 polygon.xpoints[i] += velocity;
             }
@@ -91,21 +116,87 @@ public class Arrow {
 
     }
 
-    public void rotate(Graphics g, int angle) {
-
-        AffineTransform rotate = AffineTransform.getRotateInstance(
-                Math.toRadians(angle), 100, 100);
-        
-        Polygon translatedPolygon = new Polygon();
-
-        for (int i = 0; i < polygon.npoints; i++) {
-            Point p = new Point(polygon.xpoints[i], polygon.ypoints[i]);
-            rotate.transform(p, p);
-            translatedPolygon.addPoint(p.x, p.y);
-        }
-        setPolygon(translatedPolygon);
-        drawArrow(g);
-
+    public boolean getIsStop() {
+        return isStop;
     }
 
+    public void setIsStop(boolean isStop) {
+        this.isStop = isStop;
+    }
+    
+//    public void rotate(Graphics2D g, int W, int H, int rotation){
+//        AffineTransform identify = new AffineTransform();
+//        g.translate(900, 500);
+//        g.scale(20, 20);
+//        g.rotate(Math.toRadians(rotation));
+//        
+//        drawArrow(g);
+////        g.setColor(Color.red);
+////        g.fillPolygon(polygon);
+////        g.setColor(Color.BLUE);
+////        g.draw(polygon);
+//        
+//    }
+
+    public void rotate(Graphics g, int angle, Point p) {
+//        System.out.println("this.angle");
+//        this.angle = getAngle(curX, curY, p.x, p.y);
+//        this.angle = 20;
+//        if(this.angle > 90){
+//            System.out.println("angle > 90 : " + this.angle);
+//            this.angle = 90;
+//        }else if(this.angle < 0){
+//            System.out.println("angle < 0 : " + this.angle);
+//            this.angle = 0;
+//        }
+        System.out.println("Angle : " + angle);
+        float radian = (float) angle * 3.14f / 180;
+        int[] xs = polygon.xpoints;
+        int[] ys = polygon.ypoints;
+        int xp = p.x;
+        int yp = p.y;
+        float t, v;
+        for (int i = 0; i < polygon.npoints; i++) {
+            t = xs[i] - xp;
+            v = ys[i] - yp;
+            xs[i] = (int) (xp + t * Math.cos(radian) - v * Math.sin(radian));
+            ys[i] = (int) (yp + v * Math.cos(radian) + t * Math.sin(radian));
+        }
+        polygon.xpoints = xs;
+        polygon.ypoints = ys;
+        System.out.println(Arrays.toString(polygon.xpoints));
+        drawArrow(g);
+    }
+    
+//    public static double getDistance(int x1, int y1, int x2, int y2) {
+//        
+//        double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+//        return distance;
+//    }
+//
+//    public static int getAngle(int curX, int curY, int x1, int y1) {
+//
+//        double distance1 = getDistance(curX, curY, x1, y1);
+//        double distance2 = getDistance(curX, y1, x1, y1);
+//        int angle = (int) Math.round(Math.toDegrees(Math.acos(distance2 / distance1)));
+//        System.out.println("angle : " + angle);
+//        return angle;
+//    }
+
+//    public void rotate(Graphics g, int angle) {
+//
+//        AffineTransform rotate = AffineTransform.getRotateInstance(
+//                Math.toRadians(angle), 100, 100);
+//        
+//        Polygon translatedPolygon = new Polygon();
+//
+//        for (int i = 0; i < polygon.npoints; i++) {
+//            Point p = new Point(polygon.xpoints[i], polygon.ypoints[i]);
+//            rotate.transform(p, p);
+//            translatedPolygon.addPoint(p.x, p.y);
+//        }
+//        setPolygon(translatedPolygon);
+//        drawArrow(g);
+//
+//    }
 }

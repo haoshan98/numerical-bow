@@ -2,7 +2,10 @@ package numerical_bow;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.JWindow;
 
@@ -41,8 +44,9 @@ import javax.swing.JWindow;
  */
 public class NumericalBow extends JPanel {
 
-    private Image img;
-    private Point lastPoint;
+    private Graphics2D g;
+    private BufferedImage image;
+    private Background background;
     private Dimension world_size;
     private Dimension viewport_size;
     private int offsetMaxX;
@@ -51,15 +55,29 @@ public class NumericalBow extends JPanel {
     private int offsetMinY;
     private int camX = 0;
     private int camY = 0;
-    private final Point p1;  //player 1
-    private final Point p2;  //player 2
-    private Arrow[] arrow = new Arrow[2];
-    private Point[] arrowLoc = new Point[2];
-    private boolean[] isReleased = {false, false};
-    private boolean[] init = {true, true};
-    private boolean[] toMove = {false, false};
-    private boolean isDrag = false;
-    private boolean once = true;
+    private final Point playerL;
+    private final Point playerR;
+    private ArrayList<Arrow> landedArrow = new ArrayList<>();
+    private Arrow arrowL;
+    private Arrow arrowR;
+    private boolean isReleasedL = false;
+    private boolean isReleasedR = false;
+    private boolean initL = true;
+    private boolean initR = true;
+    private boolean toMoveL = false;
+    private boolean toMoveR = false;
+    private boolean isDragL = false;
+    private boolean isDragR = false;
+    private boolean isLeft = true;
+    private boolean isDropL = false;
+    private boolean END = false;
+    private boolean isLeftTurn = false;
+    private boolean isRightTurn = false;
+    private int angleL = 0;
+    private int angleR = 0;
+    private int rotation = 0;
+    private int width = 0;
+    private int height = 0;
 
     public NumericalBow() {
 
@@ -71,9 +89,15 @@ public class NumericalBow extends JPanel {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
         //Layout
         setBackground(new Color(0xFFEBCD));
+        background = new Background();
+//        try {
+//            image = ImageIO.read(new File("src\\numerical_bow\\background.jpg"));
+//        } catch (Exception e) {
+//            System.out.println(e);
+//        }
+
         this.viewport_size = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(new Dimension(10000, viewport_size.height));
         this.world_size = getPreferredSize();
@@ -84,90 +108,162 @@ public class NumericalBow extends JPanel {
         this.offsetMinX = 0;
         this.offsetMinY = 0;
 
-//        camX = playerX - VIEWPORT_SIZE_X / 2
-//        camY = playerY - VIEWPORT_SIZE_Y / 2
-//                
-//        if (camX > offsetMaxX) {
-//            camX = offsetMaxX;
-//        } else if (camX < offsetMinX) {
-//            camX = offsetMinX;
-//        }
-//        if (camY > offsetMaxY) {
-//            camY = offsetMaxY;
-//        } else if (camY < offsetMinY) {
-//            camY = offsetMinY;
-//        }
         //Players init
-        this.p1 = new Point(100, 100);
-        this.p2 = new Point(700, 100);
+        this.playerL = new Point(100, 100);
+        this.playerR = new Point(700, 100);
+
+        this.width = getSize().width;
+        this.height = getSize().height;
 
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.getX() < 450) {
-                    System.out.println("\nMouse press on left");
-                    init[0] = false;
-                    isReleased[0] = true;
-                    toMove[0] = true;
-                    toMove[1] = false;
-                } else {
-                    System.out.println("\nMouse press on right");
-                    init[1] = false;
-                    isReleased[1] = true;
-                    toMove[1] = true;
-                    toMove[0] = false;
-                }
-                updateCamera();
-                repaint();
-            }
-            
-        });
+            public void mouseReleased(MouseEvent e) {
+                isReleasedL = true;
+                Thread shoot = new Thread() {
+                    public void run() {
+                        while (!isDropL) {
+                            updateCamera();
+                            repaint();
+                            isDropL = arrowL.getIsStop();
+                            try {
+                                Thread.sleep(1000 / 10);  // milliseconds
+                            } catch (InterruptedException ex) {
+                            }
 
-        addMouseMotionListener(new MouseMotionAdapter() {
+                        }
+                    }
+                };
+                shoot.start();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                switch (e.getButton()) {
+                    case MouseEvent.BUTTON1:
+                        System.out.println("button 1");
+                        rotation-=5;
+//                        if (rotation < 0) {
+//                            rotation = 359;
+//                        }
+                        
+                        initL = false;
+                        isReleasedL = true;
+                        toMoveL = true;
+                        toMoveR = false;
+                        isLeft = true;
+                        
+                        repaint();
+                        break;
+                    case MouseEvent.BUTTON3:
+                        System.out.println("button 3");
+                        rotation++;
+//                        if (rotation > 360) {
+//                            rotation = 0;
+//                        }
+                        repaint();
+                        break;
+
+                }
+//                if (e.getX() < 450) {
+//                    System.out.println("\nMouse press on left");
+//                    initL = false;
+//                    isReleasedL = true;
+//                    toMoveL = true;
+//                    toMoveR = false;
+//                    isLeft = true;
+//
+//                } else {
+//                    System.out.println("\nMouse press on right");
+//                    initR = false;
+//                    isReleasedR = true;
+//                    toMoveR = true;
+//                    toMoveL = false;
+//                    isLeft = false;
+//                }
+
+//                updateCamera();
+//
+//                repaint();
+            }
+
+        }
+        );
+
+        addMouseMotionListener(
+                new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                init[0] = false;
-                init[1] = false;
-                isDrag = true;
-                System.out.println(e.getX() + ", "+ e.getY());
-                
-                updateCamera();
-                repaint();
-            }
-        });
+//                 Thread pullBow = new Thread() {
+//                        public void run() {
+//                            while (!isReleasedL) {
+//                                arrowL.pull(g, e.getX(), e.getY());
+//                                System.out.println(arrowL.getArrowCurrentLoc().x);
+//                                updateCamera();
+//                                repaint();
+//                                try {
+//                                    Thread.sleep(1000 / 10);  // milliseconds
+//                                } catch (InterruptedException ex) {
+//                                }
 //
+//                            }
+//                        }
+//                    };
+//                    pullBow.start();
+
+//                if (e.getX() < 450) {
+//                    System.out.println("\nMouse drag on left");
+//                    initL = false;
+//                    isReleasedL = true;
+//                    toMoveL = true;
+//                    toMoveR = false;
+//                    isDragL = true;
+//                    isLeft = true;
+////                    adjustArrow(e.getX(), e.getY(), true);
+//                    arrowL.rotate(g, e.getX(), e.getY(), new Point(100, 100));
+//
+//                } else {
+//                    System.out.println("\nMouse drag on right");
+//                    initR = false;
+//                    isReleasedR = true;
+//                    toMoveR = true;
+//                    toMoveL = false;
+//                    isDragR = true;
+//                    isLeft = false;
+//
+//                }
+//                System.out.println(e.getX() + ", " + e.getY());
+//                updateCamera();
+//                repaint();
+            }
+        }
+        );
+
 //        addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed(KeyEvent e) {
 //                switch (e.getKeyCode()) {
 //                    case KeyEvent.VK_LEFT:
 //                        if (!END) {
-//                            moveLeft();
+//                            System.out.println("Left key pressed.");
 //                        }
 //                        break;
 //                    case KeyEvent.VK_RIGHT:
 //                        if (!END) {
-//                            moveRight();
+//                            System.out.println("Right key pressed.");
 //                        }
 //                        break;
-//                    case KeyEvent.VK_U:
-//                        if (!END) {
-//                            undo();
-//                        }
-//                        break;
+//    
 //                }
 //                repaint();
 //            }
 //        });
     }
-    
 
     private void updateCamera() {
 
-//        camX = playerX - VIEWPORT_SIZE_X / 2
-//        camY = playerY - VIEWPORT_SIZE_Y / 2
-        this.camX = arrow[0].getPolygon().xpoints[6] - this.viewport_size.width / 2;
-        this.camY = arrow[0].getPolygon().ypoints[6] - this.viewport_size.height / 2;
+        this.camX = arrowL.getPolygon().xpoints[6] - this.viewport_size.width / 2;
+        this.camY = arrowL.getPolygon().ypoints[6] - this.viewport_size.height / 2;
 
         if (camX > offsetMaxX) {
             camX = offsetMaxX;
@@ -184,89 +280,111 @@ public class NumericalBow extends JPanel {
     @Override
     public void paintComponent(Graphics gg) {
         super.paintComponent(gg);
-        Graphics2D g = (Graphics2D) gg;
+        g = (Graphics2D) gg;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-
+//        background.drawBackground(g, viewport_size.width, 300);
         g.translate(-camX, -camY);
 
         draw(g);
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics2D g) {
 
-        createPlayer(g, p1, true);
-        createPlayer(g, p2, false);
+        createPlayer(g, playerL, true);
+        createPlayer(g, playerR, false);
 
         createLand(g);
+
+        shootArrow(isLeft);
+//        adjustArrow(isLeft);
+        rotate();
 
         lifeBar(g);
 
     }
 
-    public void createPlayer(Graphics g, Point p, boolean isFaceRight) {
+    public void createPlayer(Graphics g, Point p, boolean isLeft) {
         int height = 100;
-        int width = 20;
+        int width = 15;
 
         //body
         g.fillOval(p.x, p.y, width, height / 2);
         //head
         g.fillOval(p.x, p.y - width, width, width);
         //leg
-        g.fillOval(p.x, p.y + height / 2, height / width * 2, height / 2 - width);
-        g.fillOval(p.x + width / 2, p.y + height / 2, height / width * 2, height / 2 - width);
+        g.fillOval(p.x, p.y + height / 2, height / (width + 5) * 2, height / 2 - width);
+        g.fillOval(p.x + width / 2, p.y + height / 2, height / (width + 5) * 2, height / 2 - width);
 
         //hand
-        g.fillOval(p.x - width - 10, p.y + width, height / 2 - width, height / width + 2);
-        g.fillOval(p.x + width, p.y + width, height / 2 - width, height / width + 2);
-
+//        g.fillOval(p.x - width - 10, p.y + width, height / 2 - width, height / width + 2);
+//        g.fillOval(p.x + width, p.y + width, height / 2 - width, height / width + 2);
         //bow
         //TODO: Movable hand & bow, link with arrow
         //TODO: Arrow dragging (control both power & angle)
         //arrow
-        if (init[0] & !isReleased[0] & isFaceRight) {
-            arrow[0] = new Arrow(g, new Point(p.x + 20, p.y), isFaceRight);
-
-            System.out.println("Arrow 0 created");
-//            System.out.println("Arrow 0 initial : " + Arrays.toString(arrow[0].xPoints));
-
-        } else if (init[1] & !isReleased[1] & !isFaceRight) {
-            arrow[1] = new Arrow(g, new Point(p.x - 50, p.y), isFaceRight);
-
-            System.out.println("Arrow 1 created");
-//            System.out.println("Arrow 1 initial : " + Arrays.toString(arrow[1].xPoints));
-
-        }
-
-        if (isReleased[0] & isFaceRight) {
-            if (toMove[0]) {
-                arrow[0].move(g, 50);
-                System.out.println("Arrow 0 : " + Arrays.toString(arrow[0].getPolygon().xpoints));
-            } else {
-                arrow[0].move(g, 0);
-            }
-        } else if (isReleased[1] & !isFaceRight) {
-            if (toMove[1]) {
-                arrow[1].move(g, 50);
-                System.out.println("Arrow 1 : " + Arrays.toString(arrow[1].getPolygon().xpoints));
-
-            } else {
-                arrow[1].move(g, 0);
-            }
-
-        }
-        
-//        if (isDrag & once){
-//            once = false;
-//            arrow[0].rotate(g, 100);
-//            System.out.println("=======================");
-//        }
+        createArrow(isLeft);
 
     }
 
+    public void createArrow(boolean isLeft) {
+        if (initL & !isReleasedL & isLeft) {
+            initL = false;
+            arrowL = new Arrow(g, new Point(playerL.x + 20, playerL.y), isLeft);
+
+            System.out.println("Arrow 0 created");
+
+        } else if (initR & !isReleasedR & !isLeft) {
+            initR = false;
+            arrowR = new Arrow(g, new Point(playerR.x - 50, playerR.y), isLeft);
+
+            System.out.println("Arrow 1 created");
+
+        }
+    }
+
+    public void shootArrow(boolean isLeft) {
+        if (isReleasedL & toMoveL & isLeft) {
+            arrowL.move(g, 50);
+//            System.out.println("x : " + arrowL.getArrowCurrentLoc().x);
+            if (arrowL.getArrowCurrentLoc().x > 650) {
+                System.out.println("should stop");
+                arrowL.move(g, 0);
+                arrowL.setIsStop(true);
+            }
+
+            System.out.println("Arrow 0 : " + Arrays.toString(arrowL.getPolygon().xpoints));
+            arrowR.move(g, 0);
+
+        } else if (isReleasedR & toMoveR & !isLeft) {
+            arrowR.move(g, 50);
+            System.out.println("Arrow 1 : " + Arrays.toString(arrowR.getPolygon().xpoints));
+            arrowL.move(g, 0);
+
+        }
+    }
+    
+    public void rotate(){
+        arrowL.rotate(g, rotation, new Point(100, 100));
+        arrowR.rotate(g, 0, new Point(100, 100));
+
+    }
+
+//    public void adjustArrow(int curX, int curY, boolean isLeft) {
+//
+//        if (isDragL & toMoveL & isLeft) {
+//            
+//            arrowL.rotate(g, curX, curY, new Point(100, 100));
+////            arrowR.rotate(g, 0, new Point(700, 100));
+//        } else if (isDragR & toMoveR & !isLeft) {
+////            arrowR.rotate(g, 10, new Point(700, 100));
+////            arrowL.rotate(g, 0, new Point(100, 100));
+//        }
+//    }
+
     public void createLand(Graphics g) {
 
-        g.drawLine(0, 300, 900, 300);
+        g.drawLine(0, 300, 10000, 300);
     }
 
     //TODO: lifeBar update

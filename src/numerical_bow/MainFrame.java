@@ -1,19 +1,20 @@
 package numerical_bow;
 
 import java.awt.*;
+import javax.security.auth.login.Configuration;
 import javax.swing.*;
 import javax.swing.border.*;
 
 
-public class MainFrame {
+public class MainFrame{
 
     public static void main(String args[]) {
 
         JFrame frame = new JFrame("Bow Shooting Game");
+        frame.setLayout(new BorderLayout());
         BorderLayout layout = new BorderLayout();
         frame.setLayout(layout);
         NumericalBow bowPanel = new NumericalBow();
-
         JScrollPane gameboard = new JScrollPane(bowPanel);
 
         gameboard.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -21,7 +22,7 @@ public class MainFrame {
 //        gameboard.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);  
 //        gameboard.setViewportBorder(new LineBorder(Color.BLACK));  
 
-        frame.getContentPane().add(gameboard, BorderLayout.CENTER);
+        frame.getContentPane().add(gameboard, layout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 500);
         frame.setLocationRelativeTo(null);

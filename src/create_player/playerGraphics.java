@@ -6,18 +6,15 @@ import java.awt.geom.Line2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import javax.swing.WindowConstants;
-import javax.swing.JFrame;
+import javax.swing.*;
 import java.lang.Math.*;
 
-public class playerGraphics extends Component implements MouseListener, MouseMotionListener {
+public class playerGraphics extends JPanel implements MouseListener, MouseMotionListener {
 
     int sX = -1, sY = -1;
     static Label stat;
-    Image bImage;
     boolean dragging = false;
     int curX = 300, curY = 190;
-    int maxX, maxY_upper, maxY_lower, minX;
 
     public static void main(String[] av) {
 

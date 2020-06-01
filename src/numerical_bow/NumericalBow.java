@@ -3,43 +3,15 @@ package numerical_bow;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.naming.CompositeName;
 import javax.swing.*;
 import javax.swing.JWindow;
+import java.awt.geom.Line2D;
+import javax.swing.WindowConstants;
+import javax.swing.JFrame;
+import java.lang.Math.*;
 
-// http://greenteapress.com/thinkjava6/html/thinkjava6017.html
-// https://www.youtube.com/watch?v=pDafZdIIeNE
-// https://gamedev.stackexchange.com/questions/44256/how-to-add-a-scrolling-camera-to-a-2d-java-game
-/**
- * 1) Once the game is start, both player stand at their position, with bow and
- * arrow
- *
- * 2) When mouse click is pointed near the particular player, the dragging(X)
- * control power, dragging(Y) control direction(angle).
- *
- * 3) When mouse click released, arrow is being shoot with certain acceleration.
- *
- *
- * --later when we make 2 players far apart, our scene should follow the flying
- * of the arrow.
- *
- * 4) Two condition for the released arrow:
- *
- * --4a) successfully attacked opponent
- *
- * ----decrease opponent life, if less than 0, died, game over
- *
- * --4b) drop to floor (then change arrow to another color)
- *
- * 5) Once the shooting is done, created new arrow for player
- *
- * 6) The scene will stop at the arrow stop point (either land or another
- * player)
- *
- * --We use scroll bar(controlled by keyboard?) to find another player
- *
- * 7) Another player start to shoot.
- */
-public class NumericalBow extends JPanel {
+public class NumericalBow extends JPanel{
 
     private Image img;
     private Point lastPoint;
@@ -60,6 +32,8 @@ public class NumericalBow extends JPanel {
     private boolean[] toMove = {false, false};
     private boolean isDrag = false;
     private boolean once = true;
+    private int sX, sY;
+    public int curX, curY;
 
     public NumericalBow() {
 
@@ -84,19 +58,6 @@ public class NumericalBow extends JPanel {
         this.offsetMinX = 0;
         this.offsetMinY = 0;
 
-//        camX = playerX - VIEWPORT_SIZE_X / 2
-//        camY = playerY - VIEWPORT_SIZE_Y / 2
-//                
-//        if (camX > offsetMaxX) {
-//            camX = offsetMaxX;
-//        } else if (camX < offsetMinX) {
-//            camX = offsetMinX;
-//        }
-//        if (camY > offsetMaxY) {
-//            camY = offsetMaxY;
-//        } else if (camY < offsetMinY) {
-//            camY = offsetMinY;
-//        }
         //Players init
         this.p1 = new Point(100, 100);
         this.p2 = new Point(700, 100);
@@ -120,8 +81,9 @@ public class NumericalBow extends JPanel {
                 updateCamera();
                 repaint();
             }
-            
+
         });
+
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -130,37 +92,221 @@ public class NumericalBow extends JPanel {
                 init[1] = false;
                 isDrag = true;
                 System.out.println(e.getX() + ", "+ e.getY());
-                
+
                 updateCamera();
                 repaint();
             }
+
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                curX = p.x;
+                curY = p.y;
+                System.out.println("position of curX " + curX);
+                System.out.println("position of curY " + curY);
+
+                repaint();
+            }
+
         });
-//
-//        addKeyListener(new KeyAdapter() {
-//            @Override
-//            public void keyPressed(KeyEvent e) {
-//                switch (e.getKeyCode()) {
-//                    case KeyEvent.VK_LEFT:
-//                        if (!END) {
-//                            moveLeft();
-//                        }
-//                        break;
-//                    case KeyEvent.VK_RIGHT:
-//                        if (!END) {
-//                            moveRight();
-//                        }
-//                        break;
-//                    case KeyEvent.VK_U:
-//                        if (!END) {
-//                            undo();
-//                        }
-//                        break;
-//                }
-//                repaint();
-//            }
-//        });
+    };
+
+
+    public int[] drawLinesLeft(Graphics2D g2d, Stroke stroke, Point p1, Point p2){
+        g2d.setStroke(stroke);
+
+        int screen_split = 450;
+
+        int newX_p1 = 0, newY_p1 = 0;
+        int newX_p2 = 0, newY_p2 = 0;
+
+        int minX_p1 = p1.x-20, maxX_p1 = p1.x+20 ,maxY_p1 = p1.y+30, minY_p1 = p1.y-20;
+        int minX_p2 = p2.x, maxX_p2 = p2.x+40 ,maxY_p2 = p2.y+30, minY_p2 = p2.y-20;
+
+
+        if (curX<450) {
+
+            newX_p2 = minX_p2;
+            newY_p2 = minY_p2;
+            if (curX <= minX_p1) { //range
+                if (curY >= maxY_p1) {
+                    System.out.println("p1 c1.1");
+                    newX_p1 = minX_p1;
+                    newY_p1 = maxY_p1;
+                } else if (curY <= minY_p1) {
+                    System.out.println("p1 c1.2");
+                    newX_p1 = minX_p1;
+                    newY_p1 = minY_p1;
+                } else {
+                    System.out.println("p1 c1");
+                    newX_p1 = minX_p1 - 10;
+                    newY_p1 = curY;
+                }
+            } else if (curY >= maxY_p1) { //range = 20
+                System.out.printf("p1 c2");
+                if (curX >= maxX_p1) {
+                    newX_p1 = maxX_p1;
+                    newY_p1 = maxY_p1;
+                } else {
+                    newY_p1 = maxY_p1;
+                    newX_p1 = curX;
+                }
+            } else if (curY <= minY_p1) { //range = 20
+                System.out.println("p1 c3");
+                if (curX >= maxX_p1) {
+                    newX_p1 = maxX_p1;
+                    newY_p1 = maxY_p1;
+                } else {
+                    newY_p1 = minY_p1;
+                    newX_p1 = curX;
+                }
+            } else if ((curX > maxX_p1 && curY > minY_p1 && curY < maxY_p1)) {
+                System.out.println("p1 c4");
+                newY_p1 = curY;
+                newX_p1 = maxX_p1;
+            } else if ((curX > minX_p1 && curY > minY_p1 && curY < maxY_p1)) {
+                System.out.println("p1 c4");
+                newY_p1 = curY;
+                newX_p1 = curX;
+            }
+        }
+
+        else if (curX>=450){
+            newX_p1 = maxX_p1;
+            newY_p1 = maxY_p1;
+            if (curX >= maxX_p2) {
+                if (curY >= maxY_p2) {
+                    System.out.println("c1.1");
+                    newX_p2 = maxX_p2;
+                    newY_p2 = maxY_p2;
+                }
+                else if (curY <= minY_p2) {
+                    System.out.println("c1.2");
+                    newX_p2 = maxX_p2;
+                    newY_p2 = minY_p2;
+                }
+                else {
+                    System.out.println("c1");
+                    newX_p2 = maxX_p2;
+                    newY_p2 = curY;
+                }
+            }
+            else if (curY >= maxY_p2) {
+                System.out.println("c2");
+                if (curX <= minX_p2) {
+                    newX_p2 = minX_p2;
+                    newY_p2 = maxY_p2;
+                }
+                else {
+                    newY_p2 = maxY_p2;
+                    newX_p2 = curX;
+                }
+            }
+            else if (curY <= minY_p2) { //range = 20
+                System.out.println("c3");
+                if (curX <= minX_p2) {
+                    newX_p2 = minX_p2;
+                    newY_p2 = maxY_p2;
+                }
+                else {
+                    newY_p2 = minY_p2;
+                    newX_p2 = curX;
+                }
+            }
+            else if ((curX < minX_p2 && curY > minY_p2 && curY < maxY_p2)) {
+                System.out.println("c4");
+                newY_p2 = curY;
+                newX_p2 = minX_p2;
+            }
+            else if ((curX > minX_p2 && curY > minY_p2 && curY < maxY_p2)) {
+                System.out.println("c4 2 ");
+                newY_p2 = curY;
+                newX_p2 = curX;
+            }
+            else{
+                newX_p2 = curX;
+                newY_p2 = curY;
+            }
+
+
+//            second player
+        }
+
+//       Player 1
+        g2d.setColor(Color.black);
+        g2d.drawLine(newX_p1,newY_p1,p1.x, p1.y);
+        g2d.setColor(Color.black);
+        g2d.drawLine(newX_p1,newY_p1,p1.x,p1.y+10);
+//      Player 2
+        g2d.setColor(Color.black);
+        g2d.drawLine(newX_p2,newY_p2,p2.x + 20, p2.y);
+        g2d.setColor(Color.black);
+        g2d.drawLine(newX_p2,newY_p2,p2.x + 20,p2.y+10);
+
+        int[] points = new int[4];
+
+        points[0] = newX_p1;
+        points[1] = newY_p1;
+
+        points[2] = newX_p2;
+        points[3] = newY_p2;
+
+        System.out.println("points : " + p1.getX() + p1.getY());
+        System.out.println("points : " + p2.getX() + p1.getY());
+
+        return points;
     }
-    
+
+    public void drawLinesRight(int[] points, Graphics2D g2d, Stroke stroke){
+        int oppositeY_p1 = points[1], oppositeX_p1 = points[0];
+        int oppositeY_p2 = points[3], oppositeX_p2 = points[2];
+        int distance_p1 = oppositeY_p1 - p1.y;
+        int distance_p2 = oppositeY_p2 - p2.y;
+        int newX_p1 = p1.x + 20;
+        int newY_p1 = 0;
+        int newX_p2 = p2.x;
+        int newY_p2 = 0;
+
+        g2d.getStroke();
+
+//        player 1
+        if (curX<450) {
+            if (distance_p1 >= 0 && oppositeX_p1 <= 100) {
+                newX_p1 += 20;
+                newY_p1 = p1.y - distance_p1;
+            } else if (distance_p1 < 0 && oppositeX_p1 <= 100) {
+                newX_p1 += 30;
+                newY_p1 = p1.y - distance_p1;
+            } else if (oppositeX_p1 > 100) {
+                newX_p1 = p1.x+10;
+                newY_p1 = p1.y;
+            }
+            g2d.setColor(Color.black);
+            g2d.drawLine(p1.x+20, p1.y,newX_p1,newY_p1);
+        }
+
+//        player 2
+        else if(curX>=450) {
+
+            if (distance_p2 >= 0 && oppositeX_p2 <= p2.x + 40) {
+                newX_p2 -= 20;
+                newY_p2 = p2.y - distance_p2;
+            }
+            else if (distance_p2 < 0 && oppositeX_p2 > p2.x+10) {
+                newX_p2 -= 30;
+                newY_p2 = p2.y - distance_p2 + 10;
+            }
+            if (curX <= p2.x ){
+                newX_p2 = p2.x;
+                newY_p2 = p2.y;
+            }
+
+            g2d.setColor(Color.black);
+            g2d.drawLine(p2.x, p2.y,newX_p2,newY_p2);
+
+        }
+    }
 
     private void updateCamera() {
 
@@ -180,6 +326,7 @@ public class NumericalBow extends JPanel {
             camY = offsetMinY;
         }
     }
+
 
     @Override
     public void paintComponent(Graphics gg) {
@@ -208,17 +355,27 @@ public class NumericalBow extends JPanel {
         int height = 100;
         int width = 20;
 
+        Graphics2D g2d = (Graphics2D) g;
+        Stroke stroke = new BasicStroke(2f);
+
         //body
-        g.fillOval(p.x, p.y, width, height / 2);
+//        g.fillOval(p.x, p.y, width, height / 2);
+        g.fillRect(p.x, p.y, width, height / 3);
         //head
         g.fillOval(p.x, p.y - width, width, width);
+
+
         //leg
-        g.fillOval(p.x, p.y + height / 2, height / width * 2, height / 2 - width);
-        g.fillOval(p.x + width / 2, p.y + height / 2, height / width * 2, height / 2 - width);
+//        g.fillOval(p.x, p.y + height / 2, height / width * 2, height / 2 - width);
+//        g.fillOval(p.x + width / 2, p.y + height / 2, height / width * 2, height / 2 - width);
 
         //hand
-        g.fillOval(p.x - width - 10, p.y + width, height / 2 - width, height / width + 2);
-        g.fillOval(p.x + width, p.y + width, height / 2 - width, height / width + 2);
+//        g.fillOval(p.x - width - 10, p.y + width, height / 2 - width, height / width + 2);
+//        g.fillOval(p.x + width, p.y + width, height / 2 - width, height / width + 2);
+
+        int[] pointsLeft = drawLinesLeft(g2d, stroke, p1, p2);
+        drawLinesRight(pointsLeft, g2d, stroke);
+
 
         //bow
         //TODO: Movable hand & bow, link with arrow

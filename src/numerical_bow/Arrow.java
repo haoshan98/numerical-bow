@@ -95,15 +95,6 @@ public class Arrow {
         drawArrow(g);
     }
 
-    //TODO: arrow movement (acceleration, decceleration), rotation
-    public void move(Graphics g, int velocity) {
-        for (int i = 0; i < polygon.npoints; i++) {
-            polygon.xpoints[i] += velocity;
-//            polygon.ypoints[i] += a;
-        }
-        drawArrow(g);
-
-    }
 
     public void accelerate(double xAcc, double yAcc, double difTime) {
         xVelocity += xAcc * difTime;
@@ -152,6 +143,18 @@ public class Arrow {
     }
 
     public void projectile(Graphics g) {
+
+    }
+    
+    
+    
+    //TODO: arrow movement (acceleration, decceleration), rotation
+    public void move(Graphics g, int velocity) {
+        for (int i = 0; i < polygon.npoints; i++) {
+            polygon.xpoints[i] += velocity;
+//            polygon.ypoints[i] += a;
+        }
+        drawArrow(g);
 
     }
 

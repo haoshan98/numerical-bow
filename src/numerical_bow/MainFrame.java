@@ -13,13 +13,12 @@ public class MainFrame {
         frame.setLayout(layout);
         NumericalBow bowPanel = new NumericalBow();
 
-//        JScrollPane gameboard = new JScrollPane(bowPanel);
-//        gameboard.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-//        gameboard.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        gameboard.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);  
-//        gameboard.setViewportBorder(new LineBorder(Color.BLACK));  
-//        frame.getContentPane().add(gameboard, BorderLayout.CENTER);
-        frame.getContentPane().add(bowPanel, BorderLayout.CENTER);
+        JScrollPane gameboard = new JScrollPane(bowPanel);
+        gameboard.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        gameboard.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        gameboard.setViewportBorder(new LineBorder(Color.BLACK));  
+        frame.getContentPane().add(gameboard, BorderLayout.CENTER);
+//        frame.getContentPane().add(bowPanel, BorderLayout.CENTER);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 500);

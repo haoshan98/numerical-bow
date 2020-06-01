@@ -1,12 +1,13 @@
 package numerical_bow;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 
 public class Arrow {
 
     private Point arrowInitLoc;
-    private int arrowL = 35;
+    private int arrowL = 50;
     private int arrowW = 2;
     private boolean isLeft;
 
@@ -79,29 +80,36 @@ public class Arrow {
         return new Point(getPolygon().xpoints[6], getPolygon().ypoints[6]);
     }
 
+    public boolean getIsStop() {
+        return isStop;
+    }
+
+    public void setIsStop(boolean isStop) {
+        this.isStop = isStop;
+    }
+
     public void drawArrow(Graphics g) {
 
         g.fillPolygon(polygon);
-        System.out.println(polygon.xpoints[6]);
+//        System.out.println(polygon.xpoints[6]);
 //        g.fillOval(polygon.xpoints[0], polygon.ypoints[0], 10, 10);
     }
 
-    public void pull(Graphics g, int x, int y) {
+    public void projectile(Graphics g, double xV, double yV, double deltaTime) {
         for (int i = 0; i < polygon.npoints; i++) {
-            polygon.xpoints[i] += x / 100;
-//          polygon.ypoints[i] -= y/100;
+            polygon.xpoints[i] += xV * deltaTime;
+            polygon.ypoints[i] -= yV * deltaTime;
         }
 
         drawArrow(g);
     }
-
 
     public void accelerate(double xAcc, double yAcc, double difTime) {
         xVelocity += xAcc * difTime;
         yVelocity += yAcc * difTime;
         System.out.println("x v : " + xVelocity + "y v : " + yVelocity);
     }
-    
+
     public void move(Graphics g, double diffTime) {
         for (int i = 0; i < polygon.npoints; i++) {
             polygon.xpoints[i] += xVelocity * diffTime;
@@ -111,20 +119,11 @@ public class Arrow {
 
     }
 
-
-    public boolean getIsStop() {
-        return isStop;
-    }
-
-    public void setIsStop(boolean isStop) {
-        this.isStop = isStop;
-    }
-
     public void rotate(Graphics g, int angle, Point p) {
 
         System.out.println("Angle : " + angle);
         float radian = (float) angle * 3.14f / 180;
-        
+
         int[] xs = polygon.xpoints;
         int[] ys = polygon.ypoints;
         int xp = p.x;
@@ -142,12 +141,6 @@ public class Arrow {
         drawArrow(g);
     }
 
-    public void projectile(Graphics g) {
-
-    }
-    
-    
-    
     //TODO: arrow movement (acceleration, decceleration), rotation
     public void move(Graphics g, int velocity) {
         for (int i = 0; i < polygon.npoints; i++) {

@@ -27,5 +27,9 @@ public class MainFrame {
         frame.setVisible(true);
 
     }
+    
+    // hand
+    // game loop
+    // life control
 
 }

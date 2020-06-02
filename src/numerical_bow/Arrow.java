@@ -1,8 +1,6 @@
 package numerical_bow;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.Arrays;
 
 public class Arrow {
 
@@ -85,12 +83,17 @@ public class Arrow {
     }
 
     public void setIsStop(boolean isStop) {
+
         this.isStop = isStop;
     }
 
     public void drawArrow(Graphics g) {
 
+        if (getIsStop()) {
+            g.setColor(Color.red);
+        }
         g.fillPolygon(polygon);
+        g.setColor(Color.BLACK);
 //        System.out.println(polygon.xpoints[6]);
 //        g.fillOval(polygon.xpoints[0], polygon.ypoints[0], 10, 10);
     }
@@ -104,53 +107,51 @@ public class Arrow {
         drawArrow(g);
     }
 
-    public void accelerate(double xAcc, double yAcc, double difTime) {
-        xVelocity += xAcc * difTime;
-        yVelocity += yAcc * difTime;
-        System.out.println("x v : " + xVelocity + "y v : " + yVelocity);
-    }
+    public void rotate(Graphics g, double angle, Point p) {
 
-    public void move(Graphics g, double diffTime) {
-        for (int i = 0; i < polygon.npoints; i++) {
-            polygon.xpoints[i] += xVelocity * diffTime;
-            polygon.ypoints[i] += yVelocity * diffTime;
+        if (angle != 0) {
+            System.out.println("Angle : " + angle);
+            float radian = (float) angle * 3.14f / 180;
+
+            int[] xs = polygon.xpoints;
+            int[] ys = polygon.ypoints;
+            int xp = p.x;
+            int yp = p.y;
+            float t, v;
+            for (int i = 0; i < polygon.npoints; i++) {
+                t = xs[i] - xp;
+                v = ys[i] - yp;
+                xs[i] = (int) (xp + t * Math.cos(radian) - v * Math.sin(radian));
+                ys[i] = (int) (yp + v * Math.cos(radian) + t * Math.sin(radian));
+            }
+            polygon.xpoints = xs;
+            polygon.ypoints = ys;
         }
         drawArrow(g);
-
     }
 
-    public void rotate(Graphics g, int angle, Point p) {
-
-        System.out.println("Angle : " + angle);
-        float radian = (float) angle * 3.14f / 180;
-
-        int[] xs = polygon.xpoints;
-        int[] ys = polygon.ypoints;
-        int xp = p.x;
-        int yp = p.y;
-        float t, v;
-        for (int i = 0; i < polygon.npoints; i++) {
-            t = xs[i] - xp;
-            v = ys[i] - yp;
-            xs[i] = (int) (xp + t * Math.cos(radian) - v * Math.sin(radian));
-            ys[i] = (int) (yp + v * Math.cos(radian) + t * Math.sin(radian));
-        }
-        polygon.xpoints = xs;
-        polygon.ypoints = ys;
-//        System.out.println(Arrays.toString(polygon.xpoints));
-        drawArrow(g);
-    }
-
-    //TODO: arrow movement (acceleration, decceleration), rotation
-    public void move(Graphics g, int velocity) {
-        for (int i = 0; i < polygon.npoints; i++) {
-            polygon.xpoints[i] += velocity;
-//            polygon.ypoints[i] += a;
-        }
-        drawArrow(g);
-
-    }
-
+//    public void move(Graphics g, int velocity) {
+//        for (int i = 0; i < polygon.npoints; i++) {
+//            polygon.xpoints[i] += velocity;
+////            polygon.ypoints[i] += a;
+//        }
+//        drawArrow(g);
+//
+//    }
+//    public void accelerate(double xAcc, double yAcc, double difTime) {
+//        xVelocity += xAcc * difTime;
+//        yVelocity += yAcc * difTime;
+//        System.out.println("x v : " + xVelocity + "y v : " + yVelocity);
+//    }
+//
+//    public void move(Graphics g, double diffTime) {
+//        for (int i = 0; i < polygon.npoints; i++) {
+//            polygon.xpoints[i] += xVelocity * diffTime;
+//            polygon.ypoints[i] += yVelocity * diffTime;
+//        }
+//        drawArrow(g);
+//
+//    }
 //    public static double getDistance(int x1, int y1, int x2, int y2) {
 //        
 //        double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));

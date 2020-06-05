@@ -94,7 +94,6 @@ public class Arrow {
         }
         g.fillPolygon(polygon);
         g.setColor(Color.BLACK);
-//        System.out.println(polygon.xpoints[6]);
 //        g.fillOval(polygon.xpoints[0], polygon.ypoints[0], 10, 10);
     }
 
@@ -127,6 +126,11 @@ public class Arrow {
             polygon.xpoints = xs;
             polygon.ypoints = ys;
         }
+        
+//        Rectangle rect2 = new Rectangle(polygon.xpoints[6], polygon.ypoints[6], arrowL, arrowW);
+//        g2d.rotate(Math.toRadians(45));
+//        g2d.draw(rect2);
+//        g2d.fill(rect2);
         drawArrow(g);
     }
 

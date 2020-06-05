@@ -276,6 +276,7 @@ public class NumericalBow extends JPanel {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 //        background.drawBackground(g, viewport_size.width, 300);
         g.translate(-camX, -camY);
+        
 
         draw(g);
     }
@@ -286,7 +287,7 @@ public class NumericalBow extends JPanel {
 
         createLand(g);
 
-        rotate();
+        rotate(g);
 
         lifeBar(g);
     }
@@ -439,7 +440,7 @@ public class NumericalBow extends JPanel {
         };
     }
 
-    public void rotate() {
+    public void rotate(Graphics2D g2d) {
         if (isLeftTurn) {
             arrows.get(roundCtn - 1).rotate(g, -angleDiff, new Point(playerL.x, landHeight - 100));
             arrows.get(roundCtn).rotate(g, 0, new Point(playerL.x, landHeight - 100));

@@ -93,7 +93,7 @@ public class BowGame extends JPanel {
         setBackground(new Color(0xFFEBCD));
 
         this.viewport_size = Toolkit.getDefaultToolkit().getScreenSize();
-        setPreferredSize(new Dimension(10000, 8000));
+        setPreferredSize(new Dimension(10000, 8000));  //10000, 8000
         this.world_size = getPreferredSize();
 
         //camera view
@@ -122,42 +122,52 @@ public class BowGame extends JPanel {
     private void updateCamera() {
 
         if (validBoxPress) {
+            System.out.println("click once");
             this.camX = this.world_size.width * position / 100;
+            this.camY = landHeight - camYAdjust;
         } else {
 
             if (isLeftTurn) {
                 if (initL & !isReleased) {
                     System.out.println("initL (camera) ");
-                    this.camY = landHeight - camYAdjust;
                     this.camX = playerL.x - 120;
+                    this.camY = landHeight - camYAdjust;
+                } else if (!isReleased) {
+                    System.out.println("prepare to shoot");
+                    int pivotX = leftArrows.get(leftArrows.size() - 1).xpoints[0];
+                    this.camX = pivotX - this.viewport_size.width / 3;
+                    this.camY = landHeight - camYAdjust;
                 } else {
                     int pivotX = leftArrows.get(leftArrows.size() - 1).xpoints[0];
                     int pivotY = leftArrows.get(leftArrows.size() - 1).ypoints[0];
                     this.camX = pivotX - this.viewport_size.width / 3;
-                    this.camY = pivotY - this.viewport_size.height / 6;
-                    this.camY = pivotY - 600;
+                    this.camY = pivotY - this.viewport_size.height / 3;
+//                    this.camY = pivotY - 1000;
                 }
             } else {
                 if (initR & !isReleased) {
                     System.out.println("initR (camera) ");
-                    this.camY = landHeight - camYAdjust;
                     this.camX = playerR.x + 120;
+                    this.camY = landHeight - camYAdjust;
+                } else if (!isReleased) {
+                    int pivotX = rightArrows.get(rightArrows.size() - 1).xpoints[0];
+                    this.camX = pivotX - this.viewport_size.width / 3;
+                    this.camY = landHeight - camYAdjust;
                 } else {
                     int pivotX = rightArrows.get(rightArrows.size() - 1).xpoints[0];
                     int pivotY = rightArrows.get(rightArrows.size() - 1).ypoints[0];
-                    System.out.println("else update camera : Pivot X : " + pivotX + ", PivotY : " + pivotY);
                     this.camX = pivotX - this.viewport_size.width / 3;
-                    this.camY = pivotY - this.viewport_size.height / 6;
-                    this.camY = pivotY - 600;
+                    this.camY = pivotY - this.viewport_size.height / 3;
+//                    this.camY = pivotY - 1000;
 
-//                    if (camY > landHeight - camYAdjust) {
-//                        System.out.println("----------------");
-//                        this.camY = landHeight - camYAdjust;
-//                    }
                 }
 
             }
-        System.out.println("camX : " + camX + ", camY : " + camY);
+            if (camY > (landHeight - camYAdjust)) {
+                System.out.println("----------------");
+                this.camY = landHeight - camYAdjust;
+            }
+            System.out.println("camX : " + camX + ", camY : " + camY);
         }
 
         if (camX > offsetMaxX) {
@@ -182,7 +192,7 @@ public class BowGame extends JPanel {
         g2d = (Graphics2D) gg;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-        updateCamera();
+
         g2d.translate(-camX, -camY);
 
         createSlider(g2d);
@@ -211,6 +221,8 @@ public class BowGame extends JPanel {
         int width = 15;
 
         g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(1f));
+
         //body
         g2d.fillOval(p.x, p.y, width, height / 2);
         //head
@@ -326,6 +338,10 @@ public class BowGame extends JPanel {
         g2d.drawLine(Joints[4].x, Joints[4].y, Joints[5].x, Joints[5].y);
 
     }
+    
+    public void animation(){
+        
+    }
 
     public void renderLeftBow(Graphics2D g2d) {
         g2d.setColor(Color.DARK_GRAY);
@@ -409,12 +425,16 @@ public class BowGame extends JPanel {
             x_[i] = (int) (+a * cos - b * sin + x0);
             y_[i] = (int) (+a * sin + b * cos + y0);
         }
+
         leftArrows.set(current, new Polygon(x_, y_, x_.length));
 
         g2d.draw(leftArrows.get(current));
         g2d.fill(leftArrows.get(current));
-
         leftArrows.set(current, temp);
+
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 15));
+        g2d.drawString(String.format("x_[4] : %d, y_[4] : %d", x_[4], y_[4]), x_[4], y_[4]);
+
     }
 
     public void renderRightArrow() {
@@ -444,8 +464,11 @@ public class BowGame extends JPanel {
 
         g2d.draw(rightArrows.get(current));
         g2d.fill(rightArrows.get(current));
-
         rightArrows.set(current, temp);
+
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 15));
+        g2d.drawString(String.format("x_[4] : %d, y_[4] : %d", x_[4], y_[4]), x_[4], y_[4]);
+
     }
 
     public void renderShootedArrow() {
@@ -476,6 +499,9 @@ public class BowGame extends JPanel {
             g2d.fill(leftArrows.get(n));
             leftArrows.set(current, temp);
 
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 15));
+            g2d.drawString(String.format("x_[4] : %d, y_[4] : %d", x_[4], y_[4]), x_[4], y_[4]);
+
         }
         for (int n = 0; n < rightArrows.size() - 1; n++) {
 
@@ -500,6 +526,8 @@ public class BowGame extends JPanel {
             g2d.draw(rightArrows.get(n));
             g2d.fill(rightArrows.get(n));
             rightArrows.set(current, temp);
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 15));
+            g2d.drawString(String.format("x_[4] : %d, y_[4] : %d", x_[4], y_[4]), x_[4], y_[4]);
 
         }
     }
@@ -507,6 +535,18 @@ public class BowGame extends JPanel {
     public void createLand(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
         g2d.drawLine(0, landHeight, 20000, landHeight);
+
+        //debug
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 15));
+        g2d.drawString(String.format("Height : %d", landHeight), playerL.x + 50, landHeight - 10);
+        g2d.drawString(String.format("CamX : %d, CamY : %d", camX, camY), camX, camY + 20);
+        int pivotX = leftArrows.get(leftArrows.size() - 1).xpoints[0];
+        int pivotY = leftArrows.get(leftArrows.size() - 1).ypoints[0];
+        int pivotXR = rightArrows.get(rightArrows.size() - 1).xpoints[0];
+        int pivotYR = rightArrows.get(rightArrows.size() - 1).ypoints[0];
+        g2d.drawString(String.format("Left : PivotX : %d, PivotY : %d", pivotX, pivotY), camX, camY + 150);
+        g2d.drawString(String.format("Right : PivotX : %d, PivotY : %d", pivotXR, pivotYR), camX, camY + 170);
+
     }
 
     public void createSlider(Graphics2D g2d) {
@@ -593,6 +633,7 @@ public class BowGame extends JPanel {
     public void shootArrow(ArrayList<Polygon> arrow) {
 
         if (!isTouch) {
+
             int current = arrow.size() - 1;
 
             Polygon temp = arrow.get(current);
@@ -604,7 +645,7 @@ public class BowGame extends JPanel {
             }
             arrow.set(current, new Polygon(x_, y_, x_.length));
             System.out.println("vx : " + vx + " | vy :" + vy);
-            System.out.println("x[0] : " + x_[0] + ", y[0] : " + y_[0]);
+            System.out.println("x[4] : " + x_[4] + ", y[4] : " + y_[4]);
             vy += gravity / 100;
             if (vx - 0.005 >= power / 2) {
                 vx -= 0.005;
@@ -618,11 +659,45 @@ public class BowGame extends JPanel {
 //                rightArrowsAngle.set(rightArrows_.size() - 1, -angle-180);
 //
 //            }
+            //rotate to confirm position
+            if (isLeftTurn) {
+                double angle = Math.toRadians(-leftArrowsAngle.get(current));
+                double sin = Math.sin(angle);
+                double cos = Math.cos(angle);
+                double x0 = leftJoints[2].x;     // point to rotate about
+                double y0 = leftJoints[2].y;
+                temp = leftArrows.get(current);
+                x_ = new int[temp.npoints];
+                y_ = new int[temp.npoints];
+                for (int i = 0; i < temp.npoints; i++) {
+                    double a = temp.xpoints[i] - x0;
+                    double b = temp.ypoints[i] - y0;
+                    x_[i] = (int) (+a * cos - b * sin + x0);
+                    y_[i] = (int) (+a * sin + b * cos + y0);
+                }
+                arrow.set(current, new Polygon(x_, y_, x_.length));
+            } else {
+                double angle = Math.toRadians(-rightArrowsAngle.get(current) - 180);
+                double sin = Math.sin(angle);
+                double cos = Math.cos(angle);
+                double x0 = rightJoints[2].x;     // point to rotate about
+                double y0 = rightJoints[2].y;
+                temp = rightArrows.get(current);
+                x_ = new int[temp.npoints];
+                y_ = new int[temp.npoints];
+                for (int i = 0; i < temp.npoints; i++) {
+                    double a = temp.xpoints[i] - x0;
+                    double b = temp.ypoints[i] - y0;
+                    x_[i] = (int) (+a * cos - b * sin + x0);
+                    y_[i] = (int) (+a * sin + b * cos + y0);
+                }
+                arrow.set(current, new Polygon(x_, y_, x_.length));
+            }
+
             //checkTouch
-//            int pivotX = arrow.get(current).xpoints[0];
-//            int pivotY = arrow.get(current).ypoints[0];
-            int pivotX = x_[0];
-            int pivotY = y_[0];
+            int pivotX = x_[4];  //arrow head
+            int pivotY = y_[4];
+            System.out.println("x[4]_ : " + pivotX + ", y[4]_ : " + pivotY);
             if (isLeftTurn) {
                 //touch player
                 if ((pivotX + length) > (playerR.x - 3) && (pivotX + length) < (playerR.x + 16)
@@ -636,9 +711,9 @@ public class BowGame extends JPanel {
                     arrowisTouch();
 
                     //touch floor    
-                } else if (pivotY > (landHeight + 120)) {
+                } else if (pivotY > (landHeight + 50)) {
                     isTouch = true;
-                    System.out.println("Left arrow dropped to floor");
+                    System.out.println("Left arrow dropped to floor " + (landHeight + 120));
                     arrowisTouch();
                 }
 
@@ -657,15 +732,17 @@ public class BowGame extends JPanel {
                     arrowisTouch();
 
                     //touch floor    
-                } else if (pivotY > (landHeight + 120)) {
+                } else if (pivotY > (landHeight + 50)) {
                     isTouch = true;
-                    System.out.println("Right arrow dropped to floor");
+                    System.out.println("Right arrow dropped to floor " + (landHeight + 120));
                     arrowisTouch();
 
                 }
 
             }
 
+            //convert back rotation
+            arrow.set(current, temp);
         }
     }
 
@@ -862,6 +939,7 @@ public class BowGame extends JPanel {
 
         public void mouseReleased(MouseEvent e) {
             if (validClick & isDrag) {
+                isReleased = true;
                 if (isLeftTurn) {
                     timer = new Timer(10, l -> {
                         shootArrow(leftArrows);
@@ -905,6 +983,14 @@ public class BowGame extends JPanel {
         public void mouseDragged(MouseEvent e) {
             if (validClick) {
                 isDrag = true;
+                
+                //bow dragging animation
+                timer = new Timer(10, l -> {
+                    animation();
+                    repaint();
+                });
+                timer.start();
+
                 // x for power
                 int horizontalDrag = (e.getX() - xStart) / 10;
                 if (isLeftTurn) {

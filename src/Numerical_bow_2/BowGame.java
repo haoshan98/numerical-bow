@@ -829,6 +829,7 @@ public class BowGame extends JPanel {
             flightTime += 2;
             vy = (float) (initvy * Math.sin(angle) + 9.8 * flightTime / 180); // in m/s
             vy = vy * 100 / 180; // in px/ticks
+            
             if (vx - 0.005 >= power / 2) {
                 vx -= 0.005;
             }

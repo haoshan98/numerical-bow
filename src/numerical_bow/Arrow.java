@@ -1,29 +1,31 @@
 package numerical_bow;
 
 import java.awt.*;
-import java.awt.geom.*;
 
 public class Arrow {
 
-    private Point arrowLoc;
-    private int arrowL = 35;
+    private Point arrowInitLoc;
+    private int arrowL = 50;
     private int arrowW = 2;
-    private boolean isToRight;
+    private boolean isLeft;
 
     private double angle;
-    private double power;
-    private double accelaration;
+    private double power = 0;
+    private double xVelocity = 0;
+    private double yVelocity = 0;
     private double gravity = 9.81;
     private Polygon polygon;
 
-    public Arrow(Graphics g, Point loc, boolean isToRight) {
-        this.isToRight = isToRight;
-        this.arrowLoc = loc;
+    private boolean isStop = false;
+
+    public Arrow(Graphics g, Point loc, boolean isLeft) {
+        this.isLeft = isLeft;
+        this.arrowInitLoc = loc;
 
         int[] xPoints;
         int[] yPoints;
         //set arrow facing side
-        if (isToRight) {
+        if (isLeft) {
             xPoints = new int[]{2, 0, 1, 3, 8, 8, 10, 8, 8, 3, 1, 0};
             yPoints = new int[]{6, 8, 9, 7, 7, 8, 6, 4, 5, 5, 3, 4};
 
@@ -55,7 +57,7 @@ public class Arrow {
 
         this.polygon = new Polygon(xPoints, yPoints, xPoints.length);
 
-        this.arrowLoc = loc;
+        this.arrowInitLoc = loc;
 
         drawArrow(g);
     }
@@ -68,44 +70,120 @@ public class Arrow {
         return polygon;
     }
 
-    public Point getArrowLoc() {
-        return arrowLoc;
+    public Point getArrowInitLoc() {
+        return arrowInitLoc;
+    }
+
+    public Point getArrowCurrentLoc() {
+        return new Point(getPolygon().xpoints[6], getPolygon().ypoints[6]);
+    }
+
+    public boolean getIsStop() {
+        return isStop;
+    }
+
+    public void setIsStop(boolean isStop) {
+
+        this.isStop = isStop;
     }
 
     public void drawArrow(Graphics g) {
-        g.drawPolygon(polygon);
-    }
 
-    //TODO: arrow movement (acceleration, decceleration), rotation
-    public void move(Graphics g, int velocity) {
-        if (isToRight) {
-            for (int i = 0; i < polygon.npoints; i++) {
-                polygon.xpoints[i] += velocity;
-            }
-        } else {
-            for (int i = 0; i < polygon.npoints; i++) {
-                polygon.xpoints[i] -= velocity;
-            }
+        if (getIsStop()) {
+            g.setColor(Color.red);
         }
-        drawArrow(g);
-
+        g.fillPolygon(polygon);
+        g.setColor(Color.BLACK);
+//        g.fillOval(polygon.xpoints[0], polygon.ypoints[0], 10, 10);
     }
 
-    public void rotate(Graphics g, int angle) {
-
-        AffineTransform rotate = AffineTransform.getRotateInstance(
-                Math.toRadians(angle), 100, 100);
-        
-        Polygon translatedPolygon = new Polygon();
-
+    public void projectile(Graphics g, double xV, double yV, double deltaTime) {
         for (int i = 0; i < polygon.npoints; i++) {
-            Point p = new Point(polygon.xpoints[i], polygon.ypoints[i]);
-            rotate.transform(p, p);
-            translatedPolygon.addPoint(p.x, p.y);
+            polygon.xpoints[i] += xV * deltaTime;
+            polygon.ypoints[i] -= yV * deltaTime;
         }
-        setPolygon(translatedPolygon);
-        drawArrow(g);
 
+        drawArrow(g);
     }
 
+    public void rotate(Graphics g, double angle, Point p) {
+
+        if (angle != 0) {
+            System.out.println("Angle : " + angle);
+            float radian = (float) angle * 3.14f / 180;
+
+            int[] xs = polygon.xpoints;
+            int[] ys = polygon.ypoints;
+            int xp = p.x;
+            int yp = p.y;
+            float t, v;
+            for (int i = 0; i < polygon.npoints; i++) {
+                t = xs[i] - xp;
+                v = ys[i] - yp;
+                xs[i] = (int) (xp + t * Math.cos(radian) - v * Math.sin(radian));
+                ys[i] = (int) (yp + v * Math.cos(radian) + t * Math.sin(radian));
+            }
+            polygon.xpoints = xs;
+            polygon.ypoints = ys;
+        }
+        
+//        Rectangle rect2 = new Rectangle(polygon.xpoints[6], polygon.ypoints[6], arrowL, arrowW);
+//        g2d.rotate(Math.toRadians(45));
+//        g2d.draw(rect2);
+//        g2d.fill(rect2);
+        drawArrow(g);
+    }
+
+//    public void move(Graphics g, int velocity) {
+//        for (int i = 0; i < polygon.npoints; i++) {
+//            polygon.xpoints[i] += velocity;
+////            polygon.ypoints[i] += a;
+//        }
+//        drawArrow(g);
+//
+//    }
+//    public void accelerate(double xAcc, double yAcc, double difTime) {
+//        xVelocity += xAcc * difTime;
+//        yVelocity += yAcc * difTime;
+//        System.out.println("x v : " + xVelocity + "y v : " + yVelocity);
+//    }
+//
+//    public void move(Graphics g, double diffTime) {
+//        for (int i = 0; i < polygon.npoints; i++) {
+//            polygon.xpoints[i] += xVelocity * diffTime;
+//            polygon.ypoints[i] += yVelocity * diffTime;
+//        }
+//        drawArrow(g);
+//
+//    }
+//    public static double getDistance(int x1, int y1, int x2, int y2) {
+//        
+//        double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+//        return distance;
+//    }
+//
+//    public static int getAngle(int curX, int curY, int x1, int y1) {
+//
+//        double distance1 = getDistance(curX, curY, x1, y1);
+//        double distance2 = getDistance(curX, y1, x1, y1);
+//        int angle = (int) Math.round(Math.toDegrees(Math.acos(distance2 / distance1)));
+//        System.out.println("angle : " + angle);
+//        return angle;
+//    }
+//    public void rotate(Graphics g, int angle) {
+//
+//        AffineTransform rotate = AffineTransform.getRotateInstance(
+//                Math.toRadians(angle), 100, 100);
+//        
+//        Polygon translatedPolygon = new Polygon();
+//
+//        for (int i = 0; i < polygon.npoints; i++) {
+//            Point p = new Point(polygon.xpoints[i], polygon.ypoints[i]);
+//            rotate.transform(p, p);
+//            translatedPolygon.addPoint(p.x, p.y);
+//        }
+//        setPolygon(translatedPolygon);
+//        drawArrow(g);
+//
+//    }
 }

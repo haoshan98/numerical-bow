@@ -535,17 +535,17 @@ public class BowGame extends JPanel {
                     int[] j_ = new int[]{h.y, h.y, h.y - 5, h.y, h.y + (this.width / 2), h.y + this.width + 5, h.y + this.width, h.y + this.width};
                     int current = leftArrows.size() - 1;
                     leftArrows.set(current, new Polygon(i_, j_, i_.length));
-                    if (isRaiseArrow) {
-                        System.out.println("rrrrrrrrrrrrrrrrrrrrrrrrrrrr" + raiseAngle);
-                        leftArrowsAngle.set(current, raiseAngle);
-                        raiseAngle -= 1;
-
-                        if (raiseAngle <= angle) {
-                            isRaiseArrow = false;
-                        }
-                    } else {
-                        leftArrowsAngle.set(current, raiseAngle);
-                    }
+//                    if (isRaiseArrow) {
+//                        System.out.println("rrrrrrrrrrrrrrrrrrrrrrrrrrrr" + raiseAngle);
+//                        leftArrowsAngle.set(current, raiseAngle);
+//                        raiseAngle -= 1;
+//
+//                        if (raiseAngle <= angle) {
+//                            isRaiseArrow = false;
+//                        }
+//                    } else {
+//                        leftArrowsAngle.set(current, raiseAngle);
+//                    }
 
                 }
             } else {
@@ -591,16 +591,16 @@ public class BowGame extends JPanel {
                     int[] j_ = new int[]{h.y, h.y, h.y - 5, h.y, h.y + (this.width / 2), h.y + this.width + 5, h.y + this.width, h.y + this.width};
                     int current = rightArrows.size() - 1;
                     rightArrows.set(current, new Polygon(i_, j_, i_.length));
-                    if (isRaiseArrow) {
-                        rightArrowsAngle.set(current, -raiseAngle - 180);
-                        raiseAngle -= 1;
-
-                        if (raiseAngle <= angle) {
-                            isRaiseArrow = false;
-                        }
-                    } else {
-                        rightArrowsAngle.set(current, -angle - 180);
-                    }
+//                    if (isRaiseArrow) {
+//                        rightArrowsAngle.set(current, -raiseAngle - 180);
+//                        raiseAngle -= 1;
+//
+//                        if (raiseAngle <= angle) {
+//                            isRaiseArrow = false;
+//                        }
+//                    } else {
+//                        rightArrowsAngle.set(current, -angle - 180);
+//                    }
                 }
             }
         }
@@ -1019,13 +1019,16 @@ public class BowGame extends JPanel {
         }
         if (isLeftTurn) {
             initL = true;
-            position = (int) ((playerL.x / (world_size.width * 1.0)) * 100);
         } else {
             initR = true;
-            position = (int) ((playerR.x / (world_size.width * 1.0)) * 100);
         }
         isLeftTurn = !isLeftTurn;
         System.out.println("isLeftTurn : " + isLeftTurn);
+        if (isLeftTurn) {
+            position = (int) ((playerL.x / (world_size.width * 1.0)) * 100);
+        } else {
+            position = (int) ((playerR.x / (world_size.width * 1.0)) * 100);
+        }
         angle = 0;
         angleReleased = 0;
         flightTime = 0;
@@ -1078,7 +1081,7 @@ public class BowGame extends JPanel {
 
         public void mouseReleased(MouseEvent e) {
             if (!END) {
-                if (validClick & isDrag) {
+                if (validClick & isDrag & power > 0) {
                     isReleased = true;
                     isRaiseArrow = true;
 
@@ -1115,6 +1118,16 @@ public class BowGame extends JPanel {
                         });
                     }
                     timer.start();
+                } else {
+                    angle = 0;
+                    if (isLeftTurn) {
+                        leftArrowsAngle.set(leftArrows.size() - 1, angle);
+                    } else {
+                        rightArrowsAngle.set(rightArrows.size() - 1, -angle - 180);
+                    }
+                    raiseAngle = 40.0;
+                    isRaiseArrow = true;
+                    repaint();
                 }
 
                 if (validBoxPress) {
@@ -1135,19 +1148,6 @@ public class BowGame extends JPanel {
                 if (validClick) {
                     isDrag = true;
 
-                    // pull bowString animation
-//                    if (isPullString) {
-//                        animate = new Timer(500, l -> {  
-//                            try {
-////                                animatePullString();
-//                                animatePull();
-//                            } catch (InterruptedException ex) {
-//                                Logger.getLogger(BowGame.class.getName()).log(Level.SEVERE, null, ex);
-//                            }
-//                            repaint();
-//                        });
-//                        animate.start();
-//                    }
                     animatePull();
 
                     // x-axis for power
@@ -1175,8 +1175,28 @@ public class BowGame extends JPanel {
                     // Angle
                     if (isLeftTurn) {
                         leftArrowsAngle.set(leftArrows.size() - 1, angle);
+
+                        if (isRaiseArrow) {
+                            System.out.println("rrrrrrrrrrrrrrrrrrrrrrrrrrrr" + raiseAngle);
+                            leftArrowsAngle.set(leftArrows.size() - 1, raiseAngle);
+                            raiseAngle -= 1;
+
+                            if (raiseAngle <= angle) {
+                                isRaiseArrow = false;
+                            }
+                        }
                     } else {
                         rightArrowsAngle.set(rightArrows.size() - 1, -angle - 180);
+
+                        if (isRaiseArrow) {
+                            rightArrowsAngle.set(rightArrows.size() - 1, -raiseAngle - 180);
+                            raiseAngle -= 1;
+
+                            if (raiseAngle <= angle) {
+                                isRaiseArrow = false;
+                            }
+                        }
+
                     }
 
                     if (power > 0) {

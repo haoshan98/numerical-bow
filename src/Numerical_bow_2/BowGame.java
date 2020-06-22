@@ -642,9 +642,6 @@ public class BowGame extends JPanel {
 
     public void renderLeftArrow() {
         g2d.setColor(Color.BLACK);
-        if (isLeftTurn & isTouch) {
-            g2d.setColor(Color.RED);
-        }
         int current = leftArrows.size() - 1;
         Polygon temp = leftArrowRotate(current);
         g2d.draw(leftArrows.get(current));
@@ -673,9 +670,6 @@ public class BowGame extends JPanel {
 
     public void renderRightArrow() {
         g2d.setColor(Color.BLACK);
-        if (!isLeftTurn & isTouch) {
-            g2d.setColor(Color.RED);
-        }
         int current = rightArrows.size() - 1;
         Polygon temp = rightArrowRotate(current);
         g2d.draw(rightArrows.get(current));
@@ -687,12 +681,18 @@ public class BowGame extends JPanel {
     public void renderShootedArrow() {
         g2d.setColor(Color.RED);
         for (int n = 0; n < leftArrows.size() - 1; n++) {
+            if(!isLeftTurn && n==leftArrows.size() - 1 - 1){
+                g2d.setColor(Color.GREEN);
+            }
             Polygon temp = leftArrowRotate(n);
             g2d.draw(leftArrows.get(n));
             g2d.fill(leftArrows.get(n));
             leftArrows.set(n, temp);
         }
         for (int n = 0; n < rightArrows.size() - 1; n++) {
+            if(isLeftTurn && n==rightArrows.size() - 1 - 1){
+                g2d.setColor(Color.GREEN);
+            }
             Polygon temp = rightArrowRotate(n);
             g2d.draw(rightArrows.get(n));
             g2d.fill(rightArrows.get(n));
